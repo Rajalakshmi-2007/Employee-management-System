@@ -6,7 +6,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out Java project from GitHub...'
-                checkout scm
             }
         }
 
@@ -15,6 +14,8 @@ pipeline {
                 echo 'Compiling Java source code...'
 
                 bat '''
+                    cd employee-management-system-java-html-css
+
                     if exist out rmdir /s /q out
                     mkdir out
 
@@ -25,9 +26,11 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo 'Checking compiled classes...'
+                echo 'Checking compiled Java classes...'
 
                 bat '''
+                    cd employee-management-system-java-html-css
+
                     if not exist out\\com\\example\\employee\\Employee.class (
                         echo Employee.class not found!
                         exit /b 1
@@ -38,7 +41,7 @@ pipeline {
                         exit /b 1
                     )
 
-                    echo Java compilation test passed.
+                    echo Java compilation test passed successfully.
                 '''
             }
         }
@@ -48,6 +51,8 @@ pipeline {
                 echo 'Packaging application...'
 
                 bat '''
+                    cd employee-management-system-java-html-css
+
                     if exist package rmdir /s /q package
 
                     mkdir package
@@ -58,15 +63,17 @@ pipeline {
                     xcopy /E /I /Y frontend package\\frontend
 
                     copy /Y run.bat package\\run.bat
+
+                    echo Application packaged successfully.
                 '''
             }
         }
 
         stage('Archive') {
             steps {
-                echo 'Archiving application package...'
+                echo 'Archiving application...'
 
-                archiveArtifacts artifacts: 'package/**',
+                archiveArtifacts artifacts: 'employee-management-system-java-html-css/package/**',
                                  fingerprint: true
             }
         }
@@ -76,13 +83,15 @@ pipeline {
                 echo 'Deploying application...'
 
                 bat '''
+                    cd employee-management-system-java-html-css
+
                     if exist deploy rmdir /s /q deploy
 
                     mkdir deploy
 
                     xcopy /E /I /Y package deploy
 
-                    echo Application deployed successfully.
+                    echo Application deployment completed.
                 '''
             }
         }
@@ -92,14 +101,14 @@ pipeline {
         success {
             echo '======================================'
             echo ' Employee Management System'
-            echo ' CI/CD Pipeline SUCCESS'
+            echo ' CI/CD PIPELINE SUCCESSFUL'
             echo '======================================'
         }
 
         failure {
             echo '======================================'
             echo ' Employee Management System'
-            echo ' CI/CD Pipeline FAILED'
+            echo ' CI/CD PIPELINE FAILED'
             echo '======================================'
         }
     }
